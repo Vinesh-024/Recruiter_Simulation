@@ -1,0 +1,7 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+chromadb_store/
+.streamlit/secrets.toml

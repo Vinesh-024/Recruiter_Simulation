@@ -1,0 +1,234 @@
+# LUNA Summarize Configuration (YAML)
+# OPT-IN model: Explicitly declare what to analyze
+
+# ═══════════════════════════════════════════════════════════════
+# WHAT LUNA DOES: Quick Reference Encyclopedia
+# ═══════════════════════════════════════════════════════════════
+# LUNA generates summaries with:
+#   • Purpose/description of each file
+#   • Components with exact line numbers
+#   • Imports and dependencies
+#   • Inputs/outputs/returns for functions
+#   • Links for easy navigation
+#
+# VALUE: A 2000-line module with a 50-line method becomes a 3-line
+# summary entry - no context lost, huge readability gain.
+#
+# This is ONLY useful for files with executable logic - code that
+# has behavior to explain. Config files, docs, and data files are
+# better read directly (summaries lose precision).
+# ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# OPT-IN PHILOSOPHY: Why this approach works better
+# ═══════════════════════════════════════════════════════════════
+#
+# Traditional opt-out configs become maintenance nightmares:
+#   - Growing list of exclusions (node_modules, dist, .next, etc.)
+#   - Every new build artifact needs a new exclusion rule
+#   - Config rot as project structure evolves
+#
+# Opt-in is superior because:
+#   ✅ Less maintenance - Only declare what matters
+#   ✅ Better performance - Skip irrelevant directories entirely
+#   ✅ Intentional scope - Clear about project structure
+#   ✅ Easier evolution - Adding new code is explicit
+#
+# RULE: Include source directories, exclude within them as needed
+# ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# INCLUDE: Directories and files to analyze
+# ═══════════════════════════════════════════════════════════════
+include:
+  # Directories containing your source code
+  # Patterns support glob syntax (*, **)
+  directories:
+    - src/
+    # Tests, dependencies, generated data, and documentation are not source directories.
+  
+  # File types to include (optional)
+  # If specified, only these extensions are analyzed
+  # If omitted, all files in directories are included
+  filetypes:
+    - .py
+  
+  # Specific files to always include (optional)
+  # Useful for root-level entry points
+  files:
+    # - index.ts
+    # - main.py
+    # - app.tsx
+
+# ═══════════════════════════════════════════════════════════════
+# EXCLUDE: Refinements within included directories
+# ═══════════════════════════════════════════════════════════════
+exclude:
+  # Patterns to skip within included directories
+  # Use this to filter out tests, generated files, etc.
+  patterns:
+    - "**/test_*.py"
+    - "**/*_test.py"
+    - "**/__tests__/**"
+    - "**/tests/**"
+    - "**/__pycache__/**"
+    - "**/*.pyc"
+    - "**/*.pyo"
+    - "**/.pytest_cache/**"
+    - "**/venv/**"
+    - "**/.venv/**"
+    - "**/chromadb_store/**"
+    - "**/.codebase/**"
+    - "**/.git/**"
+    - "**/.env"
+    - "**/requirements.txt"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/.generated/**"
+
+# ═══════════════════════════════════════════════════════════════
+# API ROUTES: Enable API endpoint extraction (Optional)
+# ═══════════════════════════════════════════════════════════════
+# If your project has API endpoints (REST, GraphQL, RPC, etc.),
+# specify the directories where route/handler files are located.
+#
+# LUNA will automatically detect and extract:
+#   • HTTP endpoints (path, method, parameters)
+#   • Request/response schemas
+#   • Authentication requirements
+#   • Descriptions and tags
+#
+# Leave empty [] or omit if no API in this project
+apiRoutes: []
+
+# COMMON PATTERNS:
+# FastAPI/Flask:
+#   apiRoutes:
+#     - core/routes/
+#     - api/endpoints/
+#
+# Express.js:
+#   apiRoutes:
+#     - server/routes/
+#     - api/handlers/
+#
+# Django:
+#   apiRoutes:
+#     - myapp/views/
+#     - api/routes/
+#
+# Spring Boot:
+#   apiRoutes:
+#     - src/main/java/com/myapp/controllers/
+#
+# Go/Gin:
+#   apiRoutes:
+#     - internal/routes/
+#     - api/handlers/
+# ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# DECISION FRAMEWORK: What to include vs exclude
+# ═══════════════════════════════════════════════════════════════
+#
+# ✅ INCLUDE DIRECTORIES with:
+#    - Business logic, algorithms, data structures
+#    - Component implementations, handlers, services
+#    - Custom utilities and helpers you wrote
+#    - Ask: "Does this directory define HOW the system works?"
+#
+# ❌ EXCLUDE PATTERNS for:
+#    - Tests (.test.*, .spec.*, __tests__/) - examples, not core logic
+#    - Generated files (.d.ts, .generated/) - not source of truth
+#    - Build artifacts (dist/, build/) - outputs, not inputs
+#    - Minified code (*.min.js) - unreadable
+#
+# YOU DON'T NEED TO EXCLUDE:
+#    - node_modules/ (not in include.directories)
+#    - .git/ (not in include.directories)
+#    - docs/ (not in include.directories)
+#    - Config files (not in include.directories)
+#
+# The opt-in model means you only process what you explicitly list.
+# No need for massive exclusion lists!
+# ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# EXAMPLES FOR COMMON PROJECT STRUCTURES
+# ═══════════════════════════════════════════════════════════════
+#
+# TypeScript/Node.js project:
+#   directories:
+#     - src/
+#   filetypes:
+#     - .ts
+#     - .tsx
+#     - .js
+#
+# Python project:
+#   directories:
+#     - myapp/
+#     - lib/
+#   filetypes:
+#     - .py
+#
+# Monorepo (multiple languages):
+#   directories:
+#     - packages/*/src/
+#     - apps/*/src/
+#   filetypes:
+#     - .ts
+#     - .tsx
+#     - .js
+#
+# Full-stack project:
+#   directories:
+#     - backend/src/
+#     - frontend/src/
+#     - shared/
+#   filetypes:
+#     - .ts
+#     - .tsx
+#     - .py
+#
+# React Native:
+#   directories:
+#     - src/
+#     - components/
+#   filetypes:
+#     - .tsx
+#     - .ts
+#     - .native.tsx
+#
+# Rust project:
+#   directories:
+#     - src/
+#     - crates/*/src/
+#   filetypes:
+#     - .rs
+# ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# AGENT REASONING GUIDE: When to add directories
+# ═══════════════════════════════════════════════════════════════
+# Ask: "Does this directory contain executable logic?"
+#
+# YES → Add to include.directories
+#   - Contains functions, classes, methods
+#   - Implements algorithms or business logic
+#   - Worth explaining in natural language
+#   Examples: src/, lib/, app/, services/
+#
+# NO → Leave it out (will be skipped automatically)
+#   - Configuration data (read directly, don't summarize)
+#   - Documentation (already human-readable)
+#   - Build outputs (not source of truth)
+#   - Dependencies (external code)
+#   Examples: node_modules/, dist/, docs/, .git/
+#
+# EDGE CASES:
+# - scripts/ directory: Include if it has complex automation
+# - config/ directory: Usually exclude (read configs directly)
+# - utils/ directory: Include (reusable logic)
+# - types/ directory: Exclude if only .d.ts files
+# ═══════════════════════════════════════════════════════════════
